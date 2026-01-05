@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Futebol.Api.Dtos;
 using Futebol.Api.Endpoints;
 using Futebol.Api.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 /* builder.Services.AddDbContext<FutebolDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))); */
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// AutoDetect tenta conectar no MySQL; durante design-time (dotnet ef) falha se o host não estiver acessível.
+// Fixamos explicitamente a versão para permitir gerar migrations offline.
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 36));
+
 builder.Services.AddDbContext<FutebolDbContext>(options =>
     options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(
-            builder.Configuration.GetConnectionString("DefaultConnection")
-        )
+        connectionString,
+        serverVersion
     )
 );
 

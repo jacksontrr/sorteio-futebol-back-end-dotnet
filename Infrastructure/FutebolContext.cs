@@ -26,11 +26,11 @@ public class FutebolDbContext : DbContext
             .IsUnique();
 
         // Garante que uma partida não tenha o mesmo time nos dois lados
-        modelBuilder.Entity<Partida>()
+        /*modelBuilder.Entity<Partida>()
             .HasCheckConstraint(
                 "CK_Partida_Times_Diferentes",
                 "TimeCasaId <> TimeVisitanteId"
-            );
+            );*/
 
         base.OnModelCreating(modelBuilder);
     }
