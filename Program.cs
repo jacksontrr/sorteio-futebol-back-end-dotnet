@@ -9,8 +9,17 @@ using Futebol.Api.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuração do EF Core
+/* builder.Services.AddDbContext<FutebolDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))); */
+
 builder.Services.AddDbContext<FutebolDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(
+            builder.Configuration.GetConnectionString("DefaultConnection")
+        )
+    )
+);
 
 // Configure JSON to use camelCase so frontend (camelCase) matches API responses
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
