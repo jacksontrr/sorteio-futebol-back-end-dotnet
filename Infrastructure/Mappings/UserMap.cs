@@ -33,6 +33,6 @@ public class UserMap : IEntityTypeConfiguration<User>
             .HasDefaultValue(false);
 
         builder.Property(x => x.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
     }
 }

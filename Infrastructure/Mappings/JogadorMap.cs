@@ -29,6 +29,6 @@ public class JogadorMap : IEntityTypeConfiguration<Jogador>
             .HasDefaultValue(true);
 
         builder.Property(x => x.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
     }
 }

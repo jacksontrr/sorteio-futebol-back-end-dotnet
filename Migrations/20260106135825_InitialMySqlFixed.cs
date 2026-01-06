@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Futebol.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMySql : Migration
+    public partial class InitialMySqlFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,7 +68,7 @@ namespace Futebol.Api.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
                     ContaGoogle = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "GETUTCDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)")
                 },
                 constraints: table =>
                 {
@@ -140,7 +140,7 @@ namespace Futebol.Api.Migrations
                     Destaque = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
                     Peso = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "GETUTCDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)")
                 },
                 constraints: table =>
                 {
