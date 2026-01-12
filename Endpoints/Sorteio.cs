@@ -100,6 +100,8 @@ namespace Futebol.Api.Endpoints
                     id = j.JogadorId,
                     nome = j.Jogador.Nome,
                     posicoes = j.Jogador.Posicao?.Split(',') ?? Array.Empty<string>(),
+                    destaque = j.Jogador.Destaque,
+                    peso = j.Jogador.Peso
                 }).ToList());
             }).AllowAnonymous();
 
