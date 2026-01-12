@@ -21,3 +21,7 @@ public record ChangePasswordDto(string? SenhaAtual, string NovaSenha);
 public record UpdateNameDto(string Nome);
 
 public record UpdateCodigoDto(string Codigo);
+
+public record RecuperarSenhaDto(string Email);
+
+public record RedefinirSenhaDto(string Token, string NovaSenha);

@@ -11,6 +11,10 @@ public class User
     // Auth (simples por enquanto)
     public string PasswordHash { get; set; } = string.Empty;
 
+    // Recuperação de Senha
+    public string? ResetPasswordToken { get; set; }
+    public DateTime? ResetPasswordTokenExpiry { get; set; }
+
     public bool Ativo { get; set; } = true;
     public bool ContaGoogle { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

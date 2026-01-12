@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Futebol.Api.Dtos;
 using Futebol.Api.Utils;
 using Futebol.Api.Infrastructure;
+using Futebol.Api.Infrastructure.Email;
 using Futebol.Api.Domain;
 
 namespace Futebol.Api.Endpoints
@@ -272,6 +273,57 @@ namespace Futebol.Api.Endpoints
 
                 return Results.Ok(new ApiResponse<object> { Data = new { message = "Código atualizado com sucesso." } });
             }).RequireAuthorization();
+
+            // Recuperação de Senha
+            app.MapPost("/api/auth/recuperar-senha", async (RecuperarSenhaDto dto, FutebolDbContext db, IEmailService emailService, HttpContext httpContext) =>
+            {
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+                if (user == null)
+                    return Results.Ok(new { message = "Se o e-mail existir, você receberá um link de recuperação." });
+
+                // Gerar token de recuperação (válido por 24 horas)
+                var resetToken = Guid.NewGuid().ToString();
+                user.ResetPasswordToken = resetToken;
+                user.ResetPasswordTokenExpiry = DateTime.UtcNow.AddHours(24);
+
+                db.Users.Update(user);
+                await db.SaveChangesAsync();
+
+                try
+                {
+                    // Construir URL de reset
+                    var scheme = httpContext.Request.Scheme;
+                    var host = httpContext.Request.Host;
+                    var resetLink = $"{scheme}://{host}/redefinir-senha?token={resetToken}";
+
+                    // Enviar e-mail
+                    await emailService.SendPasswordRecoveryEmailAsync(user.Email, resetToken, resetLink);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao enviar email: {ex.Message}");
+                    // Mesmo com erro no email, retornamos sucesso para não expor informações
+                }
+
+                return Results.Ok(new { message = "E-mail de recuperação enviado com sucesso." });
+            }).AllowAnonymous();
+
+            // Redefinição de Senha
+            app.MapPost("/api/auth/redefinir-senha", async (RedefinirSenhaDto dto, FutebolDbContext db) =>
+            {
+                var user = await db.Users.FirstOrDefaultAsync(u => u.ResetPasswordToken == dto.Token);
+                if (user == null || user.ResetPasswordTokenExpiry < DateTime.UtcNow)
+                    return Results.BadRequest(new ErrorResponse { Error = new ApiError { Message = "Token inválido ou expirado." } });
+
+                user.PasswordHash = Security.HashSenha(dto.NovaSenha);
+                user.ResetPasswordToken = null;
+                user.ResetPasswordTokenExpiry = null;
+
+                db.Users.Update(user);
+                await db.SaveChangesAsync();
+
+                return Results.Ok(new { message = "Senha redefinida com sucesso. Faça login novamente." });
+            }).AllowAnonymous();
         }
     }
 }
