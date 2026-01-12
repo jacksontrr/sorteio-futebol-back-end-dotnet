@@ -8,6 +8,7 @@ using Futebol.Api.Utils;
 using Futebol.Api.Infrastructure;
 using Futebol.Api.Infrastructure.Email;
 using Futebol.Api.Domain;
+using Futebol.Api.Configuration;
 
 namespace Futebol.Api.Endpoints
 {
@@ -275,7 +276,7 @@ namespace Futebol.Api.Endpoints
             }).RequireAuthorization();
 
             // Recuperação de Senha
-            app.MapPost("/api/auth/recuperar-senha", async (RecuperarSenhaDto dto, FutebolDbContext db, IEmailService emailService, HttpContext httpContext) =>
+            app.MapPost("/api/auth/recuperar-senha", async (RecuperarSenhaDto dto, FutebolDbContext db, IEmailService emailService, AppSettings appSettings) =>
             {
                 var user = await db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
                 if (user == null)
@@ -291,10 +292,8 @@ namespace Futebol.Api.Endpoints
 
                 try
                 {
-                    // Construir URL de reset
-                    var scheme = httpContext.Request.Scheme;
-                    var host = httpContext.Request.Host;
-                    var resetLink = $"{scheme}://{host}/redefinir-senha?token={resetToken}";
+                    // Construir URL de reset usando a URL base do frontend configurada
+                    var resetLink = $"{appSettings.FrontendUrl}/redefinir-senha?token={resetToken}";
 
                     // Enviar e-mail
                     await emailService.SendPasswordRecoveryEmailAsync(user.Email, resetToken, resetLink);

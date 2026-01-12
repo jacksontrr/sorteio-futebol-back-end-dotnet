@@ -6,6 +6,7 @@ using Futebol.Api.Dtos;
 using Futebol.Api.Endpoints;
 using Futebol.Api.Infrastructure;
 using Futebol.Api.Infrastructure.Email;
+using Futebol.Api.Configuration;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +51,10 @@ builder.Services.AddAuthentication("Bearer")
     });
 
 builder.Services.AddAuthorization();
+
+// Configure App Settings
+var appSettings = builder.Configuration.GetSection(AppSettings.SectionName).Get<AppSettings>();
+builder.Services.AddSingleton(appSettings ?? new AppSettings());
 
 // Configure Email Settings
 var emailSettings = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
